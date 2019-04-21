@@ -1,0 +1,12 @@
+---
+datacenter: ha-datacenter
+cluster: ansible_cluster1
+datastore_cluster: ansible_datastore_cluster1
+resource_pool: ansible_resource1
+datastore: /ha-datacenter/datastore/LocalDS_0
+vcenter_ip: 172.16.238.10
+vcenter_username: user
+vcenter_password: pass
+vcenter_vm_folder: vm
+
+

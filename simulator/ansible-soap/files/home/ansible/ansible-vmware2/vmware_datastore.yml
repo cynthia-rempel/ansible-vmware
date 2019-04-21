@@ -1,0 +1,54 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Gather facts from standalone ESXi server having datacenter as 'ha-datacenter'
+      local_action:
+        module: vmware_datastore_facts
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        datacenter: "{{ datacenter }}"
+        validate_certs: False
+      delegate_to: localhost
+      register: datastore_facts
+
+    - name: Print datastore facts
+      debug:
+        msg: "{{ datastore_facts }}"
+
+    - name: Print name of 0th datastore
+      debug:
+        msg: "{{ datastore_facts.datastores[0].name }}"
+
+    - name: Enter mainentance mode
+      local_action:
+        module: vmware_datastore_maintenancemode
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        datastore: "{{ datastore_facts.datastores[0].name }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Verify datastore entered maintenance mode
+      local_action:
+        module: vmware_datastore_facts
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        datacenter: "{{ datacenter }}"
+        validate_certs: False
+      delegate_to: localhost
+      register: datastore_facts
+
+    - name: Maintenance mode info
+      debug:
+        msg: "{{ datastore_facts.datastores[0].maintenanceMode }}"
+

@@ -1,0 +1,38 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Gather all registered virtual machines
+      local_action:
+        module: vmware_vm_facts
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+      delegate_to: localhost
+      register: vm_facts
+
+    - name: List registered VMs
+      debug:
+        msg: "{{ vm_facts }}"
+
+    - name: Gather all registered virtual machine templates
+      local_action:
+        module: vmware_vm_facts
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+        vm_type: template
+      delegate_to: localhost
+      register: vm_template_facts
+
+    - name: List registered VM templates
+      debug:
+        msg: "{{ vm_template_facts }}"
+

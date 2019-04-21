@@ -1,0 +1,35 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Create a virtual machine on given ESXi hostname
+      vmware_guest:
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: "8989"
+        validate_certs: no
+        folder: /ha-datacenter/vm/
+        name: test_vm_0001
+        state: poweredon
+        guest_id: centos64Guest
+        disk:
+        - size_gb: 1
+          type: thin
+          datastore: "{{datastore}}"
+        hardware:
+          memory_mb: 512
+          num_cpus: 4
+          scsi: paravirtual
+        networks:
+        - name: "VM Network"
+          mac: aa:bb:dd:aa:00:14
+          ip: 10.10.10.100
+          netmask: 255.255.255.0
+          device_type: vmxnet3
+        wait_for_ip_address: yes
+
+
+# https://github.com/ansible/ansible-modules-extras/issues/3525

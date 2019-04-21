@@ -1,0 +1,47 @@
+version: "3"
+services:
+  vcsim.service:
+    build:
+      ./vcsim
+    command: /home/go/go/bin/vcsim -httptest.serve 0.0.0.0:8989 -esx -trace -tls -tlscert /home/go/.tls/cert.crt -tlskey /home/go/.tls/private.key
+    container_name: vcsim.service
+    environment:
+      - GOVC_INSECURE=1
+      - GOVC_USERNAME=user
+      - GOVC_PASSWORD=pass
+      - GOVC_URL=https://user:pass@vcsim.service.net:8989/sdk
+      - GOVC_SIM_PID=1
+    hostname: vcsim.service.net
+    image:
+      vcsim:centos7
+    networks:
+      ansible_vmware_net:
+        aliases:
+         - vcsim.service.net
+        ipv4_address: 172.16.238.10
+  ansible-soap.service:
+    build:
+      ./ansible-soap
+    command: init
+    container_name: ansible-soap.service
+    environment:
+      - VMWARE_HOST=172.16.238.10
+      - VMWARE_PASSWORD=pass
+      - VMWARE_PORT=8989
+      - VMWARE_USER=user
+      - VMWARE_VALIDATE_CERTS=no
+    hostname: ansible-soap.service.net
+    image:
+      ansible:centos7
+    privileged: true
+    networks:
+      ansible_vmware_net:
+        aliases:
+         - ansible-soap.service.net
+        ipv4_address: 172.16.238.12
+networks:
+  ansible_vmware_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"

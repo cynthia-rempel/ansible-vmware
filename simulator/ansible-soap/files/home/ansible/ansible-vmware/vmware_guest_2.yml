@@ -1,0 +1,59 @@
+# https://medium.com/@ripon.banik/how-did-i-automate-builiding-vm-template-in-vsphere-and-run-the-vm-using-terraform-ansible-8dd302b31c25
+# create a new VM from a template
+- name: VM from template
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    vcenter_server: "vcenter.example.com"
+    vcenter_datacenter: "dc01"
+    vcenter_cluster: "cluster01"
+    vcenter_datastore: "ds01"
+    vcenter_host: "node1.example.com"
+    vcenter_network: "private_network"    
+  vars_prompt:
+   - name: vcenter_username
+     prompt: Enter the UserName
+     private: no
+   - name: vcenter_password
+     prompt: Enter the Password    
+     private: yes
+   - name: vm_state 
+     prompt: State as - present/absent/poweredon/poweredoff/restarted 
+     default: poweredon
+     private: no
+  tasks:
+    - name: Create a Windows 2016 virtual machine from a template
+      vmware_guest:
+        hostname: "{{ vcenter_server }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ vcenter_datacenter }}"
+        esxi_hostname: "{{ vcenter_host }}"
+        validate_certs: False
+        folder: /Infrastructure Servers
+        name: ansible-windows-2016-std-v2        
+        state: "{{ vm_state }}"
+        template: packer-windows-2016-std-v2        
+        disk:
+         - size_gb: "{{ disk_size | default(60) }}"
+           type: thin
+           datastore: "{{ vcenter_datastore }}"
+        hardware:
+          memory_mb: 1024
+          num_cpus: 2          
+          scsi: lsilogicsas         
+          version: 12 # Hardware version of virtual machine        
+        networks:
+          - name: "{{ vcenter_network }}"
+            ip: 10.0.100.10
+            netmask: 255.255.255.0            
+        wait_for_ip_address: false
+        customization:      
+           hostname: w2016    
+           dns_servers:
+             - 10.0.100.2     
+           timezone: 255               
+      delegate_to: localhost
+      register: windows_2016_deploy
+tags: windows_2016 

@@ -1,0 +1,53 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Gather facts about ESXi Host
+      local_action:
+        module: vmware_host_config_facts
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        esxi_hostname: "{{ vcenter_ip }}"
+        validate_certs: False
+      delegate_to: localhost
+      register: esxi_facts
+
+    - name: Print ESXi facts
+      debug:
+        msg: "{{ esxi_facts }}"
+
+    - name: Configure ESXi hostname and DNS servers
+      local_action:
+        module: vmware_dns_config
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+        change_hostname_to: vcsim
+        domainname: service.net
+        dns_servers:
+          - "8.8.8.8"
+      delegate_to: localhost
+
+#   - name: Gather updated facts about ESXi Host
+#      local_action:
+#        module: vmware_host_config_facts
+#        hostname: "{{ vcenter_ip }}"
+#        username: "{{ vcenter_username }}"
+#        password: "{{ vcenter_password }}"
+#        port: 8989
+#        esxi_hostname: "{{ vcenter_ip }}"
+#        validate_certs: False
+#      delegate_to: localhost
+#      register: esxi_new_facts
+#
+#   - name: Verify changes
+#      debug:
+#        msg: "{{ esxi_new_facts }}"
+

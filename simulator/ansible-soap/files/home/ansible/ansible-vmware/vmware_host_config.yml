@@ -1,0 +1,91 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Gather facts about ESXi host config
+      local_action:
+        module: vmware_host_config_facts
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: "8989"
+        validate_certs: no
+        esxi_hostname: "{{ vcenter_ip }}"
+      delegate_to: localhost
+      register: host_config_facts
+
+    - name: Display facts about ESXi host config
+      debug:
+        msg: "{{ host_config_facts }}"
+
+    - name: Gather DNS facts about ESXi Host
+      local_action:
+        module: vmware_host_dns_facts
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: "8989"
+        validate_certs: no
+        esxi_hostname: "{{ vcenter_ip }}"
+      delegate_to: localhost
+      register: host_dns_facts
+
+    - name: Display facts about ESXi host DNS settings
+      debug:
+        msg: "{{ host_dns_facts }}"
+
+    - name: Gather firewall facts about ESXi Host
+      local_action:
+        module: vmware_host_firewall_facts
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: "8989"
+        validate_certs: no
+        esxi_hostname: "{{ vcenter_ip }}"
+      delegate_to: localhost
+      register: host_firewall_facts
+
+    - name: Display facts about ESXi host firewall
+      debug:
+        msg: "{{ host_firewall_facts }}"
+
+    - name: Enable vvold rule set for an ESXi Host
+      local_action:
+        module: vmware_host_firewall_manager
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: "8989"
+        validate_certs: no
+        esxi_hostname: "{{ vcenter_ip }}"
+        rules:
+          - name: vvold
+            enabled: True
+      delegate_to: localhost
+
+    - name: Gather firewall facts about ESXi Host with vvold
+      local_action:
+        module: vmware_host_firewall_facts
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: "8989"
+        validate_certs: no
+        esxi_hostname: "{{ vcenter_ip }}"
+      delegate_to: localhost
+      register: host_firewall_facts
+
+    - name: Display facts about ESXi host firewall
+      debug:
+        msg: "{{ host_firewall_facts }}"
+
+    - name: Get SSL Thumbprint info about "{{ vcenter_ip }}"
+      local_action:
+        module: vmware_host_ssl_facts
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        esxi_hostname: "{{ vcenter_ip }}"
+      delegate_to: localhost
+      register: ssl_facts
+
+    - debug:
+        msg: "{{ ssl_facts }}"

@@ -1,0 +1,129 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Gather all registered virtual machines
+      local_action:
+        module: vmware_vm_facts
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+      delegate_to: localhost
+      register: vm_facts
+
+    - name: List registered VMs
+      debug:
+        msg: "{{ vm_facts.virtual_machines }}"
+
+    - name: Gather disk facts from virtual machine using name
+      local_action:
+        module: vmware_guest_disk_facts
+        datacenter: "{{ datacenter }}"
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+        folder: /ha-datacenter/vm
+        name: MicroCore-Linux
+      delegate_to: localhost
+      register: disk_facts
+
+    - name: Show facts about disks
+      debug:
+        msg: "{{ disk_facts }}"
+
+    - name: Gather facts from standalone ESXi server having datacenter as 'ha-datacenter'
+      local_action:
+        module: vmware_guest_facts
+        datacenter: "{{ datacenter }}"
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+        name: MicroCore-Linux
+      delegate_to: localhost
+      register: guest_facts
+
+    - name: Show facts about disks
+      debug:
+        msg: "{{ guest_facts }}"
+
+    - name: Find Guest's Folder using name
+      local_action:
+        module: vmware_guest_find
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+        name: MicroCore-Linux
+      delegate_to: localhost
+      register: vm_folder_facts
+
+    - name: Show VM folder
+      debug:
+        msg: "{{ vm_folder_facts }}"
+
+    - name: Create a virtual machine on given ESXi hostname
+      local_action:
+        module: vmware_guest
+        datacenter: "{{ datacenter }}"
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: 8989
+        validate_certs: False
+        folder: /ha-datacenter/vm
+        name: test_vm_0001
+        state: poweredon
+        guest_id: otherGuest
+        # esxi_hostname: "{{ vcenter_ip }}"
+        disk:
+        - size_gb: 10
+          type: thin
+          datastore: LocalDS_0
+        hardware:
+          memory_mb: 512
+          num_cpus: 4
+          scsi: paravirtual
+        networks:
+        - name: VM Network
+          mac: aa:bb:dd:aa:00:14
+          ip: 10.10.10.100
+          netmask: 255.255.255.0
+          device_type: vmxnet3
+        wait_for_ip_address: yes
+      delegate_to: localhost
+      register: new_vm_guest_facts
+
+    - name: Show VM folder
+      debug:
+        msg: "{{ new_vm_guest_facts }}"
+
+
+
+# otherGuest
+
+#    - name: Gather facts about virtual machine's boot order and related parameters
+#      local_action:
+#        module: vmware_guest_boot_facts
+#        hostname: "{{ vcenter_ip }}"
+#        username: "{{ vcenter_username }}"
+#        password: "{{ vcenter_password }}"
+#        port: 8989
+#        validate_certs: False
+#        name: "MicroCore-Linux"
+#      delegate_to: localhost
+#      register: vm_boot_order_facts
+#
+#    - name: List registered VMs
+#      debug:
+#        msg: "{{ vm_boot_order_facts }}"
+

@@ -1,0 +1,22 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Gather cluster facts from a given datacenter
+      local_action:
+        module: vmware_cluster_facts
+        hostname: "{{ vcenter_ip }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter }}"
+        validate_certs: False
+      delegate_to: localhost
+      register: cluster_facts
+
+    - name: Print cluster facts
+      debug:
+        msg: "{{ cluster_facts }}"
+

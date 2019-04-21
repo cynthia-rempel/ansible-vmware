@@ -1,0 +1,46 @@
+# TODO: add ENV for method
+# https://docs.ansible.com/ansible/latest/plugins/inventory/vmware_vm_inventory.html
+FROM registry.hub.docker.com/library/centos:centos7
+
+LABEL description="Ansible is a radically simple IT automation system."
+
+ENV container=docker \
+    node_env=production
+
+# Install EPEL
+RUN rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 \
+    && yum -y update \
+    && yum -y install epel-release wget -y \
+    && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+# Install rpms required for ansible-vmware
+RUN yum -y install \
+        ansible \
+        gcc \
+        python-pip \
+        python-pyvmomi \
+        python-requests \
+        unzip \
+        wget
+    
+RUN wget https://github.com/vmware/vsphere-automation-sdk-python/archive/v6.7.0.zip \
+    && unzip v6.7.0.zip
+
+RUN yum -y install python-devel
+
+RUN cd vsphere-automation-sdk-python-6.7.0 \
+    && pip install --upgrade --force-reinstall -r requirements.txt --extra-index-url file:///vsphere-automation-sdk-python-6.7.0/lib
+
+COPY files /
+# USER 8989
+
+# WORKDIR /home/go
+
+# RUN    && openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout .tls/private.key -out .tls/cert.crt -subj "/C=US/ST=CA/L=Anytown/O=Sparkling Network/OU=IT Department/CN=example.com"
+
+# HEALTHCHECK CMD curl -skv https://localhost:8989/about || exit 1
+
+# EXPOSE 8989
+CMD ["init"]
+# https://go-search.org/view?id=github.com%2fvmware%2fgovmomi%2fvcsim
+# CMD ["/home/go/go/bin/vcsim","-httptest.serve 0.0.0.0:8989","-esx","-trace","-tls", "-tlscert", "/home/go/.tls/cert.crt", "-tlskey", "/home/go/.tls/private.key"]

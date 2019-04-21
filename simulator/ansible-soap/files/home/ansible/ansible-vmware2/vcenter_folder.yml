@@ -1,0 +1,32 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Create a VM folder on given datacenter
+      local_action:
+        module: vcenter_folder
+        hostname: "{{ vcenter_ip}}"
+        username: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+        datacenter: "{{ datacenter }}"
+        folder_name: /DC1 
+        folder_type: datastore
+        state: present
+
+    - name: Create a subfolder under VM folder on given datacenter
+      local_action:
+        module: vcenter_folder
+        hostname: "{{ vcenter_ip}}"
+        username: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+        datacenter: "{{ datacenter }}"
+        folder_name: vm
+        parent_folder: /DC1
+        folder_type: vm
+        state: present
+

@@ -1,0 +1,20 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Provide information about a standalone ESXi server
+      local_action:
+        module: vmware_about_facts
+        hostname: "{{ vcenter_ip}}"
+        username: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+      delegate_to: localhost
+      register: esxi_about_info
+
+    - name: Print names of ESXi host system in the given vCenter
+      debug:
+        msg: "{{ esxi_about_info }}"

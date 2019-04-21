@@ -1,0 +1,70 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: group_vars
+
+    - name: Upload OVA
+      local_action:
+        module: vsphere_copy
+        host: "{{ vcenter_ip}}"
+        login: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+        src: "/MicroCore-Linux.ova"
+        datacenter: "{{ datacenter }}"
+        datastore: "{{ datastore }}"
+        path: "LocalDS_0/MicoCore-Linux.ova"
+        
+
+#    - name: Create Cluster in datacenter
+#      local_action:
+#        module: vmware_cluster
+#        hostname: "{{ vcenter_ip}}"
+#        username: "{{ vcenter_username}}"
+#        password: "{{ vcenter_password}}"
+#        validate_certs: False
+#        state: present
+#        datacenter_name: "{{ datacenter }}"
+#        cluster_name: "{{ cluster }}"
+#        enable_ha: yes
+#        enable_drs: yes
+
+#    - name: Create Resource pool in cluster
+#      vmware_resource_pool:
+#        hostname: "{{ vcenter_ip }}"
+#        username: "{{ vcenter_username}}"
+#        password: "{{ vcenter_password}}"
+#        validate_certs: False
+#        state: present
+#        datacenter: "{{ datacenter }}"
+#        cluster: "{{ cluster }}"
+#        resource_pool: "{{ resource_pool }}"
+
+#    - name: Mount VMFS datastores to ESXi
+#      vmware_host_datastore:
+#        hostname: "{{ vcenter_ip }}"
+#        username: "{{ vcenter_username }}"
+#        password: "{{ vcenter_password }}"
+#        validate_certs: False
+#        datastore_name: "vmsdatastore1"
+#        datacenter_name: "{{ datacenter }}"
+#        datastore_type: "vmfs"
+#        vmfs_device_name: 
+#        vmfs_version: 6
+#        esxi_hostname: '{{ vcenter_ip }}'
+#        state: present
+
+#    - name: Create Cluster in datacenter
+#      local_action:
+#        module: vmware_datastore_cluster
+#        hostname: "{{ vcenter_ip}}"
+#        username: "{{ vcenter_username}}"
+#        password: "{{ vcenter_password}}"
+#        validate_certs: False
+#        state: present
+#        datacenter_name: "{{ datacenter }}"
+#        datastore_cluster_name: "{{ datastore_cluster }}"
+
+
