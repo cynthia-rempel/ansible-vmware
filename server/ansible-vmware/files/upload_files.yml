@@ -1,0 +1,20 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: host_vars
+
+    - name: Upload a file to an ESXi server
+      local_action:
+        module: vsphere_copy
+        hostname: "{{ vcenter_ip}}"
+        login: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+        src: "/about_facts.iso"
+        datacenter: "{{ datacenter }}"
+        datastore: "datastore1"
+        path: "ISO/about_facts.iso"
+      delegate_to: localhost
+

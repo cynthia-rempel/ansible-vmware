@@ -1,0 +1,26 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: host_vars
+
+    - name: Configure NTP settings
+      local_action:
+        module: vmware_host_ntp
+        hostname: "{{ vcenter_ip}}"
+        username: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+        esxi_hostname: "{{ vcenter_ip }}"
+        state: present
+        ntp_servers:
+            - 5.pool.ntp.org
+            - 6.pool.ntp.org
+      delegate_to: localhost
+      register: esxi_ntp_info
+
+    - name: Print names of ESXi host system in the given vCenter
+      debug:
+        msg: "{{ esxi_ntp_info }}"
+

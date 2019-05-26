@@ -34,6 +34,16 @@ services:
     image:
       ansible:centos7
     privileged: true
+    extra_hosts:
+        - "master1.service.net:172.16.238.21"
+        - "master2.service.net:172.16.238.22"
+        - "master3.service.net:172.16.238.23"
+        - "infra1.service.net:172.16.238.31"
+        - "infra2.service.net:172.16.238.32"
+        - "infra3.service.net:172.16.238.33"
+        - "compute1.service.net:172.16.238.41"
+        - "compute2.service.net:172.16.238.42"
+        - "compute3.service.net:172.16.238.43"
     networks:
       ansible_vmware_net:
         aliases:
@@ -45,3 +55,4 @@ networks:
       driver: default
       config:
         - subnet: "172.16.238.0/24"
+

@@ -1,0 +1,7 @@
+# TODO: maybe make a separate partition or datastore for this?
+# Set up system logs
+esxcli system syslog config set --logdir=/vmfs/volumes/datastore1/systemlogs
+# hostd + vpxa log sizes
+esxcli system syslog config set --default-size=15360
+esxcli system syslog config set --default-rotate=10
+

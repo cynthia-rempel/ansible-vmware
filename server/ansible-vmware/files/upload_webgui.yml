@@ -1,0 +1,28 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: host_vars
+
+    - name: Download esxui_signed.vib
+      local_action:
+        module: get_url
+        url: https://download3.vmware.com/software/vmw-tools/esxui/esxui_signed.vib
+        dest: /esxui_signed.vib
+        mode: '0440'
+      delegate_to: localhost
+
+    - name: Upload a file to an ESXi server
+      local_action:
+        module: vsphere_copy
+        hostname: "{{ vcenter_ip}}"
+        login: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+        src: "/esxui_signed.vib"
+        datacenter: "{{ datacenter }}"
+        datastore: "datastore1"
+        path: "esxui_signed.vib"
+      delegate_to: localhost
+

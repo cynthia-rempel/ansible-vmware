@@ -1,0 +1,22 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: host_vars
+
+    - name: Get all SCSI target IDs on particular ESXi host system
+      local_action:
+        module: vmware_target_canonical_facts
+        hostname: "{{ vcenter_ip}}"
+        username: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        esxi_hostname: "{{ vcenter_ip }}"
+        validate_certs: False
+      delegate_to: localhost
+      register: scsi_tgt_facts
+
+    - name: Print SCSI target IDs on particular ESXi host system
+      debug:
+        msg: "{{ scsi_tgt_facts }}"
+

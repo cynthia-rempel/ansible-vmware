@@ -1,0 +1,23 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: include vars
+      include_vars:
+        dir: host_vars
+
+    - name: Set the state of a virtual machine to poweroff
+      local_action:
+        module: vmware_guest_powerstate
+        hostname: "{{ vcenter_ip}}"
+        username: "{{ vcenter_username}}"
+        password: "{{ vcenter_password}}"
+        validate_certs: False
+        name: "{{ guest_name }}"
+        state: powered-off
+      delegate_to: localhost
+      register: deploy
+
+    - name: Print the state of a virtual machine
+      debug:
+        msg: "{{ deploy }}"
+

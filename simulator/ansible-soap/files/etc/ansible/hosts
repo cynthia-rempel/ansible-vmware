@@ -1,3 +1,5 @@
 all:
   hosts:
     172.16.238.10:8989
+# managed_nodes
+# control
