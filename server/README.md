@@ -22,6 +22,12 @@ ssh user@esxi
 
  - browse to ui
 
+5. Make the landing page redirect to the gui
+
+   follow the directions in:
+
+ - server/ansible-vmware/files/esxi-index.html
+
 ## Reference:
 
 https://calvin.me/web-interface-for-esxi-without-vcenter/
