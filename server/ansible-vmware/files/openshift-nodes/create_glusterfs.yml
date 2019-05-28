@@ -3,7 +3,7 @@
   tasks:
     - name: include vars
       include_vars:
-        dir: host_vars
+        dir: /host_vars
 
     - name: Create a virtual machine from a template
       local_action:
@@ -13,19 +13,71 @@
         password: "{{ vcenter_password}}"
         validate_certs: False
         folder: vm
-        name: atomic000
+        name: glusterfs01
         state: poweredoff
         guest_id: centos64Guest
         disk:
-        - size_gb: 50
+        # one 3 TB OS disk, twelve 3 TB drives
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
+          type: thick
+          datastore: datastore1
+        # change to size_tb: 3
+        - size_gb: 20
           type: thick
           datastore: datastore1
         hardware:
-          memory_mb: 2048
+          # change to memory_mb: 49152
+          memory_mb: 8192
           num_cpus: 8
           scsi: paravirtual
           memory_reservation: 512
           memory_reservation_lock: True
+          # change to mem_limit: 49152
           mem_limit: 8096
           mem_reservation: 4096
           cpu_limit: 8096
@@ -41,7 +93,7 @@
           iso_path: "[datastore1] ISO/CentOS-Atomic-Host-Installer.iso"
         networks:
         - name: VM Network
-          mac: aa:bb:dd:aa:00:14
+          mac: aa:bb:dd:aa:00:17
         wait_for_ip_address: yes
       delegate_to: localhost
       register: deploy
